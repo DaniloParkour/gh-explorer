@@ -1,4 +1,4 @@
-import React, {useState, FormEvent} from 'react';
+import React, {useState, FormEvent, useEffect} from 'react';
 import logoImg from '../../assets/logo.svg';
 import {Title, Form, Repositories, Error} from './styles';
 import {FiChevronRight} from 'react-icons/fi';
@@ -19,7 +19,20 @@ const Dashboard: React.FC = () => {
 
   const [newRepo, setNewRepo] = useState('');
   const [inputError, setInputError] = useState('');
-  const [repositories, setRepositories] = useState<Repository[]>([]);
+  //const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  //Vamos agora iniciar os repositórios com o conteúdo salvo no local storage
+  const [repositories, setRepositories] = useState<Repository[]>(() => {
+    const storagedRepositories = localStorage.getItem('@GithubExplorer:repositories');
+    if(storagedRepositories)
+      return JSON.parse(storagedRepositories);
+    else
+      return [];
+  });
+
+  useEffect( () => {
+    localStorage.setItem('@GithubExplorer:repositories', JSON.stringify(repositories),);
+  }, [repositories] );
 
   async function handleAddRepository(event: FormEvent<HTMLFormElement>): Promise<void> {
     //Consumir a API do github e atualizar a lista de repositórios
